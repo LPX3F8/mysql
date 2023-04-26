@@ -26,8 +26,9 @@ import (
 
 // Registry for custom tls.Configs
 var (
-	tlsConfigLock     sync.RWMutex
-	tlsConfigRegistry map[string]*tls.Config
+	tlsConfigLock      sync.RWMutex
+	tlsConfigRegistry  map[string]*tls.Config
+	emptyDateTimeBytes = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 )
 
 // RegisterTLSConfig registers a custom tls.Config to be used with sql.Open.
@@ -252,7 +253,7 @@ func parseBinaryDateTime(num uint64, data []byte, loc *time.Location) (driver.Va
 			loc,
 		), nil
 	case 11:
-		if bytes.Equal(data[:11], []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}) {
+		if bytes.Equal(data[:11], emptyDateTimeBytes) {
 			return time.Time{}, nil
 		}
 		return time.Date(
