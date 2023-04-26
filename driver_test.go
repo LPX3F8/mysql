@@ -68,11 +68,11 @@ func init() {
 		}
 		return defaultValue
 	}
-	user = env("MYSQL_TEST_USER", "root")
-	pass = env("MYSQL_TEST_PASS", "")
+	user = env("MYSQL_TEST_USER", "hcms")
+	pass = env("MYSQL_TEST_PASS", "hcms,123")
 	prot = env("MYSQL_TEST_PROT", "tcp")
-	addr = env("MYSQL_TEST_ADDR", "localhost:3306")
-	dbname = env("MYSQL_TEST_DBNAME", "gotest")
+	addr = env("MYSQL_TEST_ADDR", "10.162.162.4:3306")
+	dbname = env("MYSQL_TEST_DBNAME", "hcms")
 	netAddr = fmt.Sprintf("%s(%s)", prot, addr)
 	dsn = fmt.Sprintf("%s:%s@%s/%s?timeout=30s", user, pass, netAddr, dbname)
 	c, err := net.Dial(prot, addr)
@@ -219,6 +219,25 @@ func TestEmptyQuery(t *testing.T) {
 		if rows.Next() {
 			dbt.Errorf("next on rows must be false")
 		}
+	})
+}
+
+func TestZeroDatetime(t *testing.T) {
+	runTests(t, dsn, func(dbt *DBTest) {
+		// Test for unexpected data
+		var columns string
+		rows := dbt.mustQuery("SELECT expired_time FROM rc_host_info where private_ip = '10.200.17.69'")
+		if rows.Next() {
+			err := rows.Scan(&columns)
+			fmt.Println(err)
+			fmt.Println(time.Parse(columns, time.RFC3339Nano))
+			if rows.Next() {
+				dbt.Error("unexpected data")
+			}
+		} else {
+			dbt.Error("no data")
+		}
+		rows.Close()
 	})
 }
 
