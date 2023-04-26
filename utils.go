@@ -28,7 +28,7 @@ import (
 var (
 	tlsConfigLock      sync.RWMutex
 	tlsConfigRegistry  map[string]*tls.Config
-	emptyDateTimeBytes = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	emptyDateTimeBytes = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 )
 
 // RegisterTLSConfig registers a custom tls.Config to be used with sql.Open.
